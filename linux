@@ -24,7 +24,7 @@ Logged-in users: `who` or `w`
 
 Q3. Explain inode and its importance in Linux file systems.
 A:
-
+ls -i
 An inode stores metadata about a file (owner, permissions, timestamps, pointers to data blocks).
 Important because the filename is just a link to an inode; filesystem efficiency relies on inodes.
 
