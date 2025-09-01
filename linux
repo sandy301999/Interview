@@ -329,8 +329,20 @@ Q4. Explain ARP, ICMP, and TCP handshake.
 A:
 
 ARP: Resolves IP → MAC
+Address Resolution Protocol
+Host A wants to send a packet to Host B on the same subnet.
+It knows Host B’s IP but not MAC.
+Host A broadcasts an ARP request: “Who has IP 192.168.1.10?”
+Host B replies with its MAC address.
+Host A can now send frames directly to Host B.
+
 ICMP: Ping & network diagnostics
+ICMP (Internet Control Message Protocol)
+ping → checks if a host is reachable
+traceroute → finds the path to a host
+
 TCP handshake: SYN → SYN-ACK → ACK
+lsof -i TCP - to check tcp connections
 
 ---
 
@@ -363,7 +375,8 @@ Change: `ip link set dev eth0 mtu 1400`
 Q8. How to set static IP using nmcli or ifcfg?
 A:
 
-`nmcli con mod eth0 ipv4.addresses 192.168.1.10/24 ipv4.gateway 192.168.1.1 ipv4.method manual`
+/etc/sysconfig/network-scripts/ifcfg-<interface>
+
 `systemctl restart NetworkManager`
 
 ---
@@ -392,6 +405,12 @@ A:
 
 iptables: `iptables -A INPUT -p tcp --dport 22 -j ACCEPT`
 firewalld: `firewall-cmd --add-port=22/tcp --permanent && firewall-cmd --reload`
+
+iptables -L -v -n --line-numbers --> view
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT --> accepts
+sudo iptables -A INPUT -s 192.168.1.100 -j DROP --> rejects
+sudo iptables -D INPUT 3 ---> delete
+
 
 ---
 
