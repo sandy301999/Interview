@@ -151,8 +151,22 @@ B. User Management & Permissions
 Q1. How to add a user, set quotas, and restrict shell access?
 A:
 
+# Create user
+sudo useradd -m sandesh
+
+# Set initial password
+sudo passwd sandesh
+
+# Set password to expire after 180 days
+sudo chage -M 180 sandesh
+
+# Force password change at next login
+sudo chage -d 0 sandesh
+
+# Add user to groups 'dev' and 'docker'
+sudo usermod -aG dev,docker sandesh
+
 Add user: `useradd -m username`
-Set quota: `edquota username`
 Restrict shell: `usermod -s /sbin/nologin username`
 
 ---
@@ -163,13 +177,58 @@ A:
 SUID (`chmod 4755 file`): Executes as file owner (e.g., `passwd`)
 SGID (`chmod 2755 dir`): New files inherit group of directory
 Sticky bit (`chmod 1777 /tmp`): Only owner can delete files
+SUID	u+s 
+SGID	g+s
 
 ---
 
 Q3. How to find files owned by a particular user?
 A:
+Find all .log files in /var/log.
+find /var/log -type f -name "*.log"
 
-`find / -user username`
+Find all directories named backup in /home/user.
+find /home/user -type d -name "*backup*"
+
+Find all files in /tmp larger than 50 MB.
+find /tmp -type f -size +50M
+
+Find all files in /home/user modified in the last 3 days.
+find /home/user -type f -mtime -3
+
+Find all empty files in /home/user.
+find /home/user -type f -empty
+
+1. Find all files in /home/user with permissions 777
+find /home/user -type f -perm 777
+
+2. Find all files in /var/www owned by user www-data
+find /var/www -type f -user www-data
+
+3. Find all .sh files in /home/user/scripts and make them executable
+find /home/user/scripts -type f -name "*.sh" -exec chmod +x {} \;
+
+4. Find all files in /tmp not accessed in the last 10 days
+find /tmp -type f -atime +10
+
+5. Find all .txt files in /home/user and delete them after confirmation
+find /home/user -type f -name "*.txt" -ok rm {} \;
+
+6. Find all files in /var/log containing the word "error" in the filename
+find /var/log -type f -name "*error*"
+
+7. Find all files in /home/user larger than 100 MB and list their details with ls -lh
+find /home/user -type f -size +100M -exec ls -lh {} \;
+
+8. Find all directories in /home that have been modified in the last 7 days
+find /home -type d -mtime -7
+
+9. Find all symbolic links in /usr/bin
+find /usr/bin -type l
+
+10. Find all .tmp files in /tmp and remove them using xargs
+find /tmp -type f -name "*.tmp" -print0 | xargs -0 rm -f
+
 
 ---
 
@@ -178,7 +237,7 @@ A:
 
 Ownership: `chown -R user:group /path`
 Permissions: `chmod -R 755 /path`
-
+groupadd groupname - to create a group
 ---
 
 Q5. How to check active user sessions and limits?
@@ -239,6 +298,16 @@ IP: Unique identifier for host (IPv4/IPv6)
 Subnetting: Divides network into smaller networks
 Default gateway: Router for external networks
 
+Network IP (Address)
+Definition: The first IP in a subnet. It represents the network itself, not any device.
+Purpose: Used by routers and switches to identify the subnet.
+
+Broadcast IP (Address)
+Definition: The last IP in a subnet. It is used to send messages to all hosts in the subnet simultaneously.
+Purpose: Useful for network operations like ARP requests or announcements.
+Cannot be assigned to a host.
+
+the first usable ip - Often chosen as the default gateway.
 ---
 
 Q2. How to view network interfaces and routing table?
