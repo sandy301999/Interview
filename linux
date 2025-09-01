@@ -40,9 +40,14 @@ Disk space usage: `df -h`
 
 Q5. Difference between hard link and soft link.
 A:
+# Create a hard link
+ln file1.txt file1_hard.txt
+
+# Create a soft link
+ln -s file1.txt file1_soft.txt
 
 Hard link: Points to inode, cannot span filesystems, deleting original doesn’t remove file.
-Soft link (symlink): Points to path, can span filesystems, broken if original deleted.
+Soft link (symlink): It points to the filename, not the inode, can span filesystems, broken if original deleted.
 
 ---
 
