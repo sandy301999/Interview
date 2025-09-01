@@ -1,0 +1,428 @@
+Here’s a structured Linux SRE/DevOps-focused reference in plain text format covering all your questions with clear answers and examples where needed:
+
+---
+
+A. Linux Boot Process & System Monitoring
+
+Q1. Explain the Linux boot process (BIOS → GRUB → Kernel → Init/systemd).
+A:
+
+1. BIOS/UEFI: Initializes hardware, performs POST, locates boot device.
+2. Bootloader (GRUB): Loads kernel and initramfs, allows choosing OS/kernel options.
+3. Kernel: Initializes hardware, mounts root filesystem, starts `init` or `systemd`.
+4. Init/Systemd: Handles user-space services, sets runlevel/targets, starts daemons.
+
+---
+
+Q2. How do you check system uptime, load average, and logged-in users?
+A:
+
+Uptime & load: `uptime` or `cat /proc/loadavg`
+Logged-in users: `who` or `w`
+
+---
+
+Q3. Explain inode and its importance in Linux file systems.
+A:
+
+An inode stores metadata about a file (owner, permissions, timestamps, pointers to data blocks).
+Important because the filename is just a link to an inode; filesystem efficiency relies on inodes.
+
+---
+
+Q4. How to find disk usage by directory (du) and disk space usage (df)?
+A:
+
+Disk usage by directory: `du -sh /path/to/dir`
+Disk space usage: `df -h`
+
+---
+
+Q5. Difference between hard link and soft link.
+A:
+
+Hard link: Points to inode, cannot span filesystems, deleting original doesn’t remove file.
+Soft link (symlink): Points to path, can span filesystems, broken if original deleted.
+
+---
+
+Q6. How to check memory usage and swap usage in Linux?
+A:
+
+`free -h`
+`vmstat -s`
+
+---
+
+Q7. How to monitor CPU usage in real-time?
+A:
+
+`top` or `htop` (interactive)
+`mpstat 1` (per CPU)
+
+---
+
+Q8. Explain Linux runlevels vs systemd targets.
+A:
+
+Runlevels: 0–6 (SysV init style).
+systemd targets: `graphical.target`, `multi-user.target` etc.
+Runlevels are mapped to systemd targets.
+
+---
+
+Q9. How to check running processes, and how to kill them?
+A:
+
+`ps aux | grep process_name`
+Kill: `kill -9 PID` or `pkill process_name`
+
+---
+
+Q10. How to schedule a cron job and check its logs?
+A:
+
+Edit cron: `crontab -e`
+Example: `0 2 /home/user/backup.sh`
+Logs: `/var/log/cron` or `journalctl -u cron`
+
+---
+
+B. User Management & Permissions
+
+Q1. How to add a user, set quotas, and restrict shell access?
+A:
+
+Add user: `useradd -m username`
+Set quota: `edquota username`
+Restrict shell: `usermod -s /sbin/nologin username`
+
+---
+
+Q2. Explain SUID, SGID, and sticky bit with examples.
+A:
+
+SUID (`chmod 4755 file`): Executes as file owner (e.g., `passwd`)
+SGID (`chmod 2755 dir`): New files inherit group of directory
+Sticky bit (`chmod 1777 /tmp`): Only owner can delete files
+
+---
+
+Q3. How to find files owned by a particular user?
+A:
+
+`find / -user username`
+
+---
+
+Q4. How to change ownership and permissions recursively?
+A:
+
+Ownership: `chown -R user:group /path`
+Permissions: `chmod -R 755 /path`
+
+---
+
+Q5. How to check active user sessions and limits?
+A:
+
+Active users: `who` or `w`
+Limits: `ulimit -a`
+
+---
+
+C. Package Management & Updates
+
+Q1. How do you install, update, and remove packages in RHEL/CentOS and Ubuntu?
+A:
+
+RHEL/CentOS: `yum install package`, `yum update package`, `yum remove package`
+Ubuntu: `apt install package`, `apt update && apt upgrade`, `apt remove package`
+
+---
+
+Q2. How to check for broken packages or dependencies?
+A:
+
+RHEL/CentOS: `rpm -Va`, `yum check`
+Ubuntu: `dpkg --configure -a`, `apt --fix-broken install`
+
+---
+
+Q3. How to configure a YUM/DNF or APT repository?
+A:
+
+YUM/DNF: Add `.repo` file under `/etc/yum.repos.d/`
+APT: Add `.list` file under `/etc/apt/sources.list.d/`
+
+---
+
+Q4. How do you rollback a package upgrade in Linux?
+A:
+
+RHEL/CentOS: `yum history undo <transaction_id>`
+Ubuntu: `apt install package=version`
+
+---
+
+Q5. How to handle kernel updates without rebooting (Ksplice/Live patching)?
+A:
+
+Use Ksplice, Kernel Live Patching, or kpatch to apply patches without reboot.
+
+---
+
+D. Networking Fundamentals
+
+Q1. Explain IP addressing, subnetting, and default gateways.
+A:
+
+IP: Unique identifier for host (IPv4/IPv6)
+Subnetting: Divides network into smaller networks
+Default gateway: Router for external networks
+
+---
+
+Q2. How to view network interfaces and routing table?
+A:
+
+Interfaces: `ip a` or `ifconfig`
+Routing table: `ip route` or `route -n`
+
+---
+
+Q3. How to check open ports and listening services?
+A:
+
+`netstat -tulpn` or `ss -tulpn`
+
+---
+
+Q4. Explain ARP, ICMP, and TCP handshake.
+A:
+
+ARP: Resolves IP → MAC
+ICMP: Ping & network diagnostics
+TCP handshake: SYN → SYN-ACK → ACK
+
+---
+
+Q5. How to troubleshoot network connectivity using ping, traceroute, and mtr?
+A:
+
+Ping: basic reachability
+Traceroute: path hops
+MTR: combination of ping & traceroute with stats
+
+---
+
+Q6. How to capture packets using tcpdump or Wireshark?
+A:
+
+Tcpdump: `tcpdump -i eth0 -nn`
+Wireshark: GUI-based capture, filter protocols
+
+---
+
+Q7. Explain MTU and how to check/change it.
+A:
+
+MTU: Max packet size on interface
+Check: `ip link show`
+Change: `ip link set dev eth0 mtu 1400`
+
+---
+
+Q8. How to set static IP using nmcli or ifcfg?
+A:
+
+`nmcli con mod eth0 ipv4.addresses 192.168.1.10/24 ipv4.gateway 192.168.1.1 ipv4.method manual`
+`systemctl restart NetworkManager`
+
+---
+
+Q9. Difference between TCP and UDP, with use cases.
+A:
+
+TCP: Reliable, connection-oriented (HTTP, SSH)
+UDP: Unreliable, connectionless (DNS, VoIP)
+
+---
+
+Q10. Explain the role of /etc/hosts, /etc/resolv.conf, and /etc/nsswitch.conf.
+A:
+
+`/etc/hosts`: Local hostname → IP mapping
+`/etc/resolv.conf`: DNS resolver configuration
+`/etc/nsswitch.conf`: Name service lookup order (hosts, passwd, groups)
+
+---
+
+E. Firewall & Security
+
+Q1. How to configure iptables/firewalld rules to allow/deny traffic?
+A:
+
+iptables: `iptables -A INPUT -p tcp --dport 22 -j ACCEPT`
+firewalld: `firewall-cmd --add-port=22/tcp --permanent && firewall-cmd --reload`
+
+---
+
+Q2. Difference between INPUT, OUTPUT, and FORWARD chains.
+A:
+
+INPUT: Incoming traffic
+OUTPUT: Outgoing traffic
+FORWARD: Routed traffic through system
+
+---
+
+Q3. How to save iptables rules permanently?
+A:
+
+RHEL: `service iptables save`
+Or `iptables-save > /etc/iptables/rules.v4`
+
+---
+
+Q4. How to implement NAT or port forwarding with iptables?
+A:
+
+NAT example: `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE`
+Port forwarding: `iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080`
+
+---
+
+Q5. How to troubleshoot firewall blocking issues?
+A:
+
+Check rules: `iptables -L -n -v` or `firewall-cmd --list-all`
+Test connectivity: `telnet host port`
+
+---
+
+Q6. Explain SELinux modes and how to troubleshoot permission issues.
+A:
+
+Modes: Enforcing, Permissive, Disabled
+Troubleshoot: `audit2allow`, `setenforce 0`, check `/var/log/audit/audit.log`
+
+---
+
+Q7. How to secure SSH (key-based auth, disable root login, change port)?
+A:
+
+Generate key: `ssh-keygen`, copy with `ssh-copy-id`
+Disable root: `PermitRootLogin no` in `/etc/ssh/sshd_config`
+Change port: `Port 2222`
+
+---
+
+Q8. Explain fail2ban and how it prevents brute-force attacks.
+A:
+
+Monitors logs, bans IPs exceeding failed login attempts via firewall rules
+
+---
+
+F. IPsec, VPN & Advanced Networking
+
+Q1. What is IPsec, and how does it secure network traffic?
+A:
+
+IPsec encrypts IP packets for secure site-to-site or host-to-host communication
+
+---
+
+Q2. Difference between transport mode and tunnel mode in IPsec.
+A:
+
+Transport: Encrypts payload only (end-to-end)
+Tunnel: Encrypts entire IP packet (gateway-to-gateway)
+
+---
+
+Q3. How to configure site-to-site IPsec using strongSwan.
+A:
+
+Configure `/etc/ipsec.conf` and `/etc/ipsec.secrets` on both gateways, then `ipsec restart`
+
+---
+
+Q4. How to verify IPsec tunnel status and logs?
+A:
+
+`ipsec status` or `ipsec statusall`
+Logs: `/var/log/syslog` or `/var/log/secure`
+
+---
+
+Q5. How to troubleshoot VPN connectivity issues?
+A:
+
+Check firewall, routes, IPsec logs, and phase1/phase2 status
+
+---
+
+Q6. Difference between IPsec and OpenVPN.
+A:
+
+IPsec: Built-in kernel support, often site-to-site
+OpenVPN: User-space SSL/TLS VPN, easier to configure, cross-platform
+
+---
+
+Q7. How to monitor network traffic and bandwidth usage per interface?
+A:
+
+`iftop`, `nload`, `vnstat`, `bmon`
+
+---
+
+G. Performance Monitoring & Troubleshooting
+
+Q1. How to check high CPU, memory, or IO usage and identify culprit processes?
+A:
+
+CPU/mem: `top` or `htop`
+IO: `iostat -xz 1`, `iotop`
+
+---
+
+Q2. Explain top, htop, vmstat, iostat, and their use cases.
+A:
+
+top/htop: Real-time CPU, memory, processes
+vmstat: System-wide memory, IO, CPU statistics
+iostat: Disk IO and utilization
+
+---
+
+Q3. How to monitor disk IO and filesystem latency?
+A:
+
+`iostat -x` or `dstat -d`
+`sar -d 1 5`
+
+---
+
+Q4. How to check kernel logs, system logs, and dmesg for issues?
+A:
+
+Kernel logs: `dmesg`
+System logs: `journalctl -xe` or `/var/log/messages`
+
+---
+
+Q5. How to troubleshoot slow boot or service startup issues?
+A:
+
+`systemd-analyze blame`
+`journalctl -b` for logs
+`systemctl status servicename`
+
+---
+
+This text is ready to be saved as a reference file.
+
+If you want, I can also create a concise one-page TXT cheat sheet with commands/examples for each topic suitable for quick interview prep. Do you want me to do that?
