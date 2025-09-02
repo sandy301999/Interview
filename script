@@ -135,4 +135,7 @@
 
 33. Automate user creation from a list
     Command:
-    while read user; do useradd $user; done < users.txt
+   while read user; do
+    id "$user" &>/dev/null || useradd "$user"
+   done < users.txt
+
