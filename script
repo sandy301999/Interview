@@ -1,0 +1,138 @@
+
+
+1. Top 10 IPs hitting a web server
+   Command:
+   awk '{print \$1}' /var/log/nginx/access.log | sort | uniq -c | sort -nr | head -10
+
+2. Find failed SSH login attempts in /var/log/auth.log
+   Command:
+   grep "Failed password" /var/log/auth.log | awk '{print \$11}' | sort | uniq -c | sort -nr
+
+3. Extract users who logged in last 24 hours
+   Command:
+   last -s -1days | awk '{print \$1}' | sort | uniq
+
+4. Count total number of error logs in the past week
+   Command:
+   grep -i "error" /var/log/app.log | grep "\$(date --date='7 days ago' '+%b %d')" -A1000 | wc -l
+
+5. Remove duplicate lines in a file
+   Command:
+   sort file.txt | uniq > file\_unique.txt
+
+6. Check if a process is running, start if not
+   Command:
+   pgrep -x nginx || systemctl start nginx
+
+7. Kill processes consuming >80% CPU
+   Command:
+   ps -eo pid,%cpu --sort=-%cpu | awk '\$2>80 {print \$1}' | xargs -r kill -9
+
+8. List top 5 memory-consuming processes
+   Command:
+   ps aux --sort=-%mem | head -6
+
+9. Monitor if a service is active, restart if inactive
+   Command:
+   systemctl is-active --quiet myapp || systemctl restart myapp
+
+10. Count number of processes owned by a user
+    Command:
+    ps -u username | wc -l
+
+11. Alert if disk usage >90%
+    Command:
+    df -h | awk '\$5+0>90 {print "Disk full: "\$0}'
+
+12. Find files >100MB in /var/log
+    Command:
+    find /var/log -type f -size +100M
+
+13. Delete files older than 7 days
+    Command:
+    find /tmp -type f -mtime +7 -exec rm -f {} ;
+
+14. Calculate disk usage of each directory in /home
+    Command:
+    du -sh /home/\* | sort -h
+
+15. Check inode usage
+    Command:
+    df -i
+
+16. Ping multiple hosts and report unreachable
+    Command:
+    for host in google.com github.com yahoo.com; do ping -c1 \$host &>/dev/null || echo "\$host unreachable"; done
+
+17. Count established TCP connections
+    Command:
+    ss -tn state established | wc -l
+
+18. Check open ports for a process
+    Command:
+    lsof -i -P -n | grep nginx
+
+19. Download file and retry if failed
+    Command:
+    curl -O [http://example.com/file](http://example.com/file) || curl -O [http://example.com/file](http://example.com/file)
+
+20. Get public IP of server
+    Command:
+    curl -s [https://ipinfo.io/ip](https://ipinfo.io/ip)
+
+21. Backup /var/log daily
+    Command:
+    tar -czf /backup/logs\_\$(date +%F).tar.gz /var/log
+
+22. Rotate logs older than 30 days
+    Command:
+    find /var/log/myapp -type f -mtime +30 -exec gzip {} ;
+
+23. Auto-clean temp files every hour
+    Command:
+    0 \* \* \* \* /usr/bin/find /tmp -type f -mtime +1 -delete
+
+24. Sync directories using rsync
+    Command:
+    rsync -avz /var/www/html/ backup\:/var/www/html/
+
+25. Restart a service if log contains error
+    Command:
+    grep -q "CRITICAL" /var/log/app.log && systemctl restart myapp
+
+26. Swap two numbers without temp variable
+    Command:
+    a=5; b=10
+    a=\$((a+b))
+    b=\$((a-b))
+    a=\$((a-b))
+
+27. Check if a string is palindrome
+    Command:
+    read str
+    \[\[ "\$str" == "\$(echo \$str | rev)" ]] && echo "Palindrome"
+
+28. Parse JSON using jq
+    Command:
+    cat file.json | jq '.data.id'
+
+29. Count number of lines, words, characters
+    Command:
+    wc file.txt
+
+30. Print last N lines containing keyword
+    Command:
+    grep "ERROR" /var/log/app.log | tail -10
+
+31. Monitor CPU load and alert if >5
+    Command:
+    load=\$(uptime | awk -F 'load average:' '{print \$2}' | cut -d, -f1)
+    awk -v l=\$load 'BEGIN{if(l>5) print "High load:", l}'
+
+32. Check if a port is in use
+    Command:
+    netstat -tuln | grep :8080
+
+33. Automate user creation from a list
+    Command:
+    while read user; do useradd \$user; done < users.txt
