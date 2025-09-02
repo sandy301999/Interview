@@ -322,6 +322,16 @@ nc -zvu for udpR
 * ARP → Resolves IP ↔ MAC.
 * MAC → Hardware address of NIC.
 
+arp 
+Your computer wants to send a packet to IP 172.31.16.1.
+It checks its ARP cache to see if it already knows the MAC address.
+If not, it sends a broadcast ARP request:
+“Who has IP 172.31.16.1? Tell me your MAC.”
+The device with that IP responds with its MAC address.
+The sender stores it in the ARP table and sends packets using that MAC.
+
+mac
+A unique hardware identifier assigned to a network interface card (NIC).
 ---
 
 ## 7. Jenkins & CI/CD
@@ -418,6 +428,8 @@ handlers:
 
 * SSL = old.
 * TLS = modern, secure encryption for HTTP, email, etc.
+SSL → Secure Sockets Layer
+TLS → Transport Layer Security
 
 **Q40. ip/ifconfig commands?**
 
