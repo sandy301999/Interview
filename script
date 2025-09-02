@@ -2,23 +2,23 @@
 
 1. Top 10 IPs hitting a web server
    Command:
-   awk '{print \$1}' /var/log/nginx/access.log | sort | uniq -c | sort -nr | head -10
+   awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -nr | head -10
 
 2. Find failed SSH login attempts in /var/log/auth.log
    Command:
-   grep "Failed password" /var/log/auth.log | awk '{print \$11}' | sort | uniq -c | sort -nr
+   grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr
 
 3. Extract users who logged in last 24 hours
    Command:
-   last -s -1days | awk '{print \$1}' | sort | uniq
+   last -s -1days | awk '{print $1}' | sort | uniq
 
 4. Count total number of error logs in the past week
    Command:
-   grep -i "error" /var/log/app.log | grep "\$(date --date='7 days ago' '+%b %d')" -A1000 | wc -l
+   grep -i "error" /var/log/app.log | grep "$(date --date='7 days ago' '+%b %d')" -A1000 | wc -l
 
 5. Remove duplicate lines in a file
    Command:
-   sort file.txt | uniq > file\_unique.txt
+   sort file.txt | uniq > file_unique.txt
 
 6. Check if a process is running, start if not
    Command:
@@ -26,7 +26,7 @@
 
 7. Kill processes consuming >80% CPU
    Command:
-   ps -eo pid,%cpu --sort=-%cpu | awk '\$2>80 {print \$1}' | xargs -r kill -9
+   ps -eo pid,%cpu --sort=-%cpu | awk '$2>80 {print $1}' | xargs -r kill -9
 
 8. List top 5 memory-consuming processes
    Command:
@@ -42,7 +42,7 @@
 
 11. Alert if disk usage >90%
     Command:
-    df -h | awk '\$5+0>90 {print "Disk full: "\$0}'
+    df -h | awk '$5+0>90 {print "Disk full: "$0}'
 
 12. Find files >100MB in /var/log
     Command:
@@ -54,7 +54,7 @@
 
 14. Calculate disk usage of each directory in /home
     Command:
-    du -sh /home/\* | sort -h
+    du -sh /home/* | sort -h
 
 15. Check inode usage
     Command:
@@ -62,7 +62,7 @@
 
 16. Ping multiple hosts and report unreachable
     Command:
-    for host in google.com github.com yahoo.com; do ping -c1 \$host &>/dev/null || echo "\$host unreachable"; done
+    for host in google.com github.com yahoo.com; do ping -c1 $host &>/dev/null || echo "$host unreachable"; done
 
 17. Count established TCP connections
     Command:
@@ -82,7 +82,7 @@
 
 21. Backup /var/log daily
     Command:
-    tar -czf /backup/logs\_\$(date +%F).tar.gz /var/log
+    tar -czf /backup/logs_$(date +%F).tar.gz /var/log
 
 22. Rotate logs older than 30 days
     Command:
@@ -90,11 +90,11 @@
 
 23. Auto-clean temp files every hour
     Command:
-    0 \* \* \* \* /usr/bin/find /tmp -type f -mtime +1 -delete
+    0 * * * * /usr/bin/find /tmp -type f -mtime +1 -delete
 
 24. Sync directories using rsync
     Command:
-    rsync -avz /var/www/html/ backup\:/var/www/html/
+    rsync -avz /var/www/html/ backup:/var/www/html/
 
 25. Restart a service if log contains error
     Command:
@@ -103,14 +103,14 @@
 26. Swap two numbers without temp variable
     Command:
     a=5; b=10
-    a=\$((a+b))
-    b=\$((a-b))
-    a=\$((a-b))
+    a=$((a+b))
+    b=$((a-b))
+    a=$((a-b))
 
 27. Check if a string is palindrome
     Command:
     read str
-    \[\[ "\$str" == "\$(echo \$str | rev)" ]] && echo "Palindrome"
+    [[ "$str" == "$(echo $str | rev)" ]] && echo "Palindrome"
 
 28. Parse JSON using jq
     Command:
@@ -126,8 +126,8 @@
 
 31. Monitor CPU load and alert if >5
     Command:
-    load=\$(uptime | awk -F 'load average:' '{print \$2}' | cut -d, -f1)
-    awk -v l=\$load 'BEGIN{if(l>5) print "High load:", l}'
+    load=$(uptime | awk -F 'load average:' '{print $2}' | cut -d, -f1)
+    awk -v l=$load 'BEGIN{if(l>5) print "High load:", l}'
 
 32. Check if a port is in use
     Command:
@@ -135,4 +135,4 @@
 
 33. Automate user creation from a list
     Command:
-    while read user; do useradd \$user; done < users.txt
+    while read user; do useradd $user; done < users.txt
