@@ -1,0 +1,627 @@
+
+
+# 🔹 Boot & System Startup Q\&A
+
+### 1. What are runlevels?
+
+Runlevels define the state of the machine (services/processes). In systemd systems, they’re replaced by *targets*.
+
+* Runlevel 0 → Halt
+* Runlevel 1 → Single user
+* Runlevel 3 → Multi-user (text)
+* Runlevel 5 → Multi-user + GUI
+* Runlevel 6 → Reboot
+
+Check current:
+
+```bash
+runlevel
+systemctl get-default
+```
+
+---
+
+### 2. Difference between runlevels and systemd targets.
+
+* Runlevels: Numeric (0–6).
+* Targets: Named, more flexible. Example:
+
+  * `multi-user.target` ≈ runlevel 3
+  * `graphical.target` ≈ runlevel 5
+
+---
+
+### 3. What is EFI and why is it used?
+
+EFI = Extensible Firmware Interface (UEFI now).
+
+* Replaces BIOS.
+* Supports large disks (>2TB, GPT).
+* Faster boot, secure boot.
+
+---
+
+### 4. Explain BIOS vs EFI.
+
+* **BIOS**: Old firmware, 16-bit, uses MBR (max 2TB disk).
+* **EFI/UEFI**: Modern firmware, 32/64-bit, supports GPT (unlimited partitions).
+
+---
+
+### 5. What is iLO and how do you configure it?
+
+iLO (Integrated Lights-Out, HP) = Remote management interface.
+
+* Configure via BIOS or DHCP-assigned IP.
+* Access via web, SSH, or CLI for power cycle, remote console.
+
+---
+
+### 6. What is a cold boot? Why and when do you perform it?
+
+* Cold boot = Power off → Power on.
+* Used after hardware changes, full reset, or system crash recovery.
+
+---
+
+### 7. What is a warm boot? Why and when do you perform it?
+
+* Warm boot = Restart without powering off (Ctrl+Alt+Del, reboot).
+* Used after software update or configuration changes.
+
+---
+
+### 8. How do you boot into single-user mode?
+
+* GRUB menu → edit kernel line → add `single` or `systemd.unit=rescue.target`.
+* Used for password reset, recovery, fixing broken config.
+
+---
+
+### 9. How do you boot into multi-user (text) mode and GUI mode?
+
+* Multi-user (no GUI):
+
+```bash
+systemctl set-default multi-user.target
+```
+
+* GUI:
+
+```bash
+systemctl set-default graphical.target
+```
+
+---
+
+### 10. Difference between rescue mode and emergency mode.
+
+* **Rescue**: Loads basic services + root FS mounted read-write.
+* **Emergency**: Minimal mode, only root shell, root FS read-only.
+
+---
+
+### 11. What happens during Linux boot process?
+
+1. BIOS/UEFI initializes hardware.
+2. Bootloader (GRUB2) loads kernel + initramfs.
+3. Kernel initializes drivers, mounts root FS.
+4. `systemd` (or init) starts services via targets.
+5. User login prompt shown.
+
+Got it 👍 You want **all topics answered in one doc** for easy revision.
+This will be long, but I’ll keep it **concise, interview-ready, and command-focused**.
+
+---
+
+# 🔹 Linux / DevOps Interview Prep (Based on Your List)
+
+---
+
+## 1. Boot & System Startup
+
+**Q1. What are runlevels?**
+
+* Defines system state (which services run).
+* Runlevels → systemd targets.
+
+  * 0 Halt
+  * 1 Single-user
+  * 3 Multi-user (text)
+  * 5 GUI
+  * 6 Reboot
+
+```bash
+runlevel
+systemctl get-default
+```
+
+**Q2. EFI vs BIOS?**
+
+* BIOS: Legacy, MBR, max 2TB disk.
+* EFI/UEFI: Modern, GPT, secure boot, larger disks.
+
+**Q3. iLO configuration?**
+
+* iLO = HP’s remote management.
+* Config via BIOS/DHCP IP.
+* Access via web/ssh → reboot, console, logs.
+
+**Q4. Cold boot vs Warm boot?**
+
+* Cold boot = Power cycle (hardware reset).
+* Warm boot = Reboot without power off (updates/config).
+
+**Q5. Boot into single/dual modes?**
+
+* Single-user: rescue/maintenance.
+* Multi-user: normal operations.
+
+```bash
+systemctl set-default multi-user.target
+systemctl set-default graphical.target
+```
+
+**Q6. Rescue vs Emergency?**
+
+* Rescue: root FS + basic services.
+* Emergency: only root shell, FS read-only.
+
+---
+
+## 2. Storage & Disk Management
+
+**Q7. Disk failure: how to unmount busy disk?**
+
+```bash
+lsof /mountpoint
+fuser -km /mountpoint
+umount -l /mountpoint
+```
+
+**Q8. LVM commands?**
+
+```bash
+lsblk
+pvcreate /dev/sdb
+vgcreate vg1 /dev/sdb
+lvcreate -n lv1 -L 5G vg1
+mkfs.ext4 /dev/vg1/lv1
+mount /dev/vg1/lv1 /mnt
+```
+
+**Q9. Can LV be extended across VG?**
+
+* No. LV can only belong to one VG. Need to add PVs to same VG first.
+
+**Q10. Fdisk vs parted?**
+
+* fdisk: Legacy, MBR.
+* parted: GPT + large disks.
+
+---
+
+## 3. User Management
+
+**Q11. How to add multiple users from file?**
+
+```bash
+while read user; do useradd $user; done < users.txt
+```
+
+**Q12. Where are user details stored?**
+
+* `/etc/passwd` → user accounts.
+* `/etc/shadow` → passwords.
+* `/etc/group` → groups.
+
+---
+
+## 4. Process Management
+
+**Q13. Where is process info stored?**
+
+* `/proc/<pid>/` → details of each process.
+* `/proc/meminfo`, `/proc/cpuinfo` → system info.
+
+**Q14. List running processes?**
+
+```bash
+ps -ef
+top
+htop
+```
+
+**Q15. Kill high CPU processes?**
+
+```bash
+ps -eo pid,%cpu --sort=-%cpu | awk '$2>80 {print $1}' | xargs -r kill -9
+```
+
+---
+
+## 5. Performance Monitoring
+
+**Q16. vmstat output?**
+
+* Shows CPU, memory, IO stats.
+
+```bash
+vmstat 1 5
+```
+
+**Q17. iostat usage?**
+
+```bash
+iostat -x 1 5
+```
+
+→ Shows disk I/O.
+
+**Q18. Load average?**
+
+```bash
+uptime
+```
+
+→ avg processes in run queue.
+
+---
+
+## 6. Networking
+
+**Q19. What is DNS cache/accelerator?**
+
+* Local caching (dnsmasq, bind) → reduces external queries.
+
+**Q20. dig, nslookup?**
+
+```bash
+dig google.com
+nslookup google.com
+```
+
+**Q21. telnet/nc for port check?**
+
+```bash
+telnet host 22
+nc -zv host 80
+```
+
+**Q22. Important OSI layers?**
+
+* 7 Layers: Physical → Application.
+* Devices:
+
+  * Switch (Layer 2)
+  * Router (Layer 3)
+  * Firewall (Layer 3/4)
+
+**Q23. Common protocols & ports?**
+
+* HTTP → TCP 80
+* HTTPS → TCP 443
+* DNS → TCP/UDP 53
+* FTP → TCP 21
+* SSH → TCP 22
+* DHCP → UDP 67/68
+
+**Q24. ARP vs MAC?**
+
+* ARP → Resolves IP ↔ MAC.
+* MAC → Hardware address of NIC.
+
+---
+
+## 7. Jenkins & CI/CD
+
+**Q25. What is REST API in Jenkins?**
+
+* Automate builds, jobs, plugins using API endpoints.
+
+```bash
+curl -u user:token http://jenkins:8080/job/test/build
+```
+
+**Q26. Jenkins Master/Slave?**
+
+* Master = controls jobs.
+* Slave/agent = executes jobs.
+
+**Q27. How to save money with many Jenkins servers?**
+
+* Use fewer masters, scale with dynamic agents (Docker/K8s).
+
+**Q28. Jenkins credentials?**
+
+* Store secrets safely in Jenkins Credential Store.
+
+**Q29. Multiple builds, how to check flow?**
+
+* Use `pipeline` with stages and visualization.
+
+---
+
+## 8. Ansible
+
+**Q30. Ad-hoc command example?**
+
+```bash
+ansible all -m ping
+ansible web -m shell -a "uptime"
+```
+
+**Q31. What are handlers?**
+
+* Run only when notified.
+
+```yaml
+handlers:
+  - name: restart apache
+    service:
+      name: httpd
+      state: restarted
+```
+
+**Q32. Why is Ansible agentless?**
+
+* Uses SSH, no agent needed on client.
+
+**Q33. Password vs Key authentication?**
+
+* Password: less secure.
+* SSH keys: more secure + automated.
+
+**Q34. Chef vs Ansible?**
+
+* Chef: Pull model, Ruby DSL.
+* Ansible: Push model, YAML playbooks.
+
+---
+
+## 9. Security
+
+**Q35. SSH key-based auth vs password?**
+
+* Key-based is more secure, supports automation.
+
+**Q36. Fail2ban usage?**
+
+* Monitors logs for failed logins, blocks IPs via iptables.
+
+---
+
+## 10. General Topics
+
+**Q37. Why 7-layer OSI instead of 5-layer TCP/IP?**
+
+* OSI is theoretical, explains abstraction in detail.
+* TCP/IP practical implementation → 5 layers.
+
+**Q38. Difference FTP vs SFTP?**
+
+* FTP: Plaintext, TCP 21.
+* SFTP: Encrypted via SSH, TCP 22.
+
+**Q39. SSL/TLS?**
+
+* SSL = old.
+* TLS = modern, secure encryption for HTTP, email, etc.
+
+**Q40. ip/ifconfig commands?**
+
+```bash
+ip a
+ip r
+ifconfig
+```
+Perfect 👍 Let’s **expand the Networking section** with interview-style questions + crisp answers. I’ll keep them **command + example** heavy since you’re targeting SRE/DevOps roles.
+
+---
+
+# 🔹 Advanced Networking Questions & Answers
+
+---
+
+## 1. Subnets & IP Addressing
+
+**Q1. What is subnetting? Why is it used?**
+
+* Divides large network into smaller logical networks.
+* Improves security, reduces broadcast domain, efficient IP allocation.
+
+**Q2. What is CIDR notation?**
+
+* Classless Inter-Domain Routing → IP with subnet mask.
+* Example: `192.168.1.0/24` → 256 IPs (254 usable).
+
+**Q3. How to calculate usable IPs in a subnet?**
+
+* Formula: `2^(32 - prefix) - 2`
+* Example: `/29 → 2^(32-29)-2 = 6 usable IPs`.
+
+---
+
+## 2. Routers, Switches & Gateways
+
+**Q4. Difference between Router, Switch, Hub?**
+
+* Hub: Broadcasts packets.
+* Switch: Layer 2, forwards based on MAC.
+* Router: Layer 3, forwards based on IP.
+
+**Q5. What is a default gateway?**
+
+* Router used when destination is outside subnet.
+
+**Q6. How do you check routing table in Linux?**
+
+```bash
+ip route
+netstat -rn
+```
+
+---
+
+## 3. VLANs & Bonding
+
+**Q7. What is VLAN?**
+
+* Virtual LAN → isolates traffic within same physical network.
+* Example: VLAN 10 = HR, VLAN 20 = Finance.
+
+**Q8. What is NIC bonding/teaming?**
+
+* Combines multiple NICs for redundancy & load balancing.
+
+```bash
+cat /proc/net/bonding/bond0
+```
+
+---
+
+## 4. ARP, MAC, DNS
+
+**Q9. What is ARP?**
+
+* Address Resolution Protocol: Resolves IP → MAC.
+
+```bash
+arp -n
+ip neigh
+```
+
+**Q10. What is difference between MAC & IP?**
+
+* MAC: Hardware address, fixed.
+* IP: Logical address, can change.
+
+**Q11. How do you flush DNS cache in Linux?**
+
+```bash
+systemd-resolve --flush-caches
+```
+
+---
+
+## 5. DHCP
+
+**Q12. How does DHCP work?**
+
+* DORA: Discover → Offer → Request → Acknowledge.
+* Assigns IP dynamically.
+
+**Q13. How to release & renew DHCP lease?**
+
+```bash
+dhclient -r
+dhclient
+```
+
+---
+
+## 6. TCP vs UDP
+
+**Q14. Difference TCP vs UDP?**
+
+* TCP: Connection-oriented, reliable (HTTP, SSH).
+* UDP: Connectionless, faster, no guarantee (DNS, DHCP).
+
+**Q15. How to check if a service is listening?**
+
+```bash
+ss -tulnp
+netstat -tulnp
+```
+
+---
+
+## 7. Common Protocols & Ports
+
+**Q16. Which protocols use TCP and UDP?**
+
+* DNS → TCP/UDP 53
+* HTTP → TCP 80
+* HTTPS → TCP 443
+* SSH → TCP 22
+* DHCP → UDP 67/68
+* NTP → UDP 123
+
+**Q17. How to test port connectivity?**
+
+```bash
+nc -zv 8.8.8.8 53
+telnet google.com 80
+```
+
+---
+
+## 8. Firewalls & iptables/nftables
+
+**Q18. How to check open firewall rules?**
+
+```bash
+iptables -L -n
+nft list ruleset
+```
+
+**Q19. How to block an IP using iptables?**
+
+```bash
+iptables -A INPUT -s 192.168.1.100 -j DROP
+```
+
+---
+
+## 9. Troubleshooting Tools
+
+**Q20. How do you check network interfaces?**
+
+```bash
+ip addr show
+ifconfig
+```
+
+**Q21. How to trace route?**
+
+```bash
+traceroute google.com
+mtr google.com
+```
+
+**Q22. How to check packet capture?**
+
+```bash
+tcpdump -i eth0 port 80
+```
+
+**Q23. How to check bandwidth usage per process?**
+
+```bash
+iftop
+nload
+```
+
+---
+
+## 10. Practical Troubleshooting Scenarios
+
+**Q24. Server cannot reach internet but local ping works. What do you check?**
+
+1. Default gateway → `ip route`
+2. DNS resolution → `dig google.com`
+3. Firewall rules → `iptables -L`
+
+**Q25. How to find which process is using a port?**
+
+```bash
+lsof -i :8080
+ss -ltnp | grep 8080
+```
+
+**Q26. How to test DNS resolution with dig?**
+
+```bash
+dig @8.8.8.8 openai.com
+```
+
