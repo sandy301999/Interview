@@ -1,5 +1,3 @@
-
-
 # 🔹 Boot & System Startup Q\&A
 
 ### 1. What are runlevels?
@@ -52,8 +50,12 @@ EFI = Extensible Firmware Interface (UEFI now).
 
 iLO (Integrated Lights-Out, HP) = Remote management interface.
 
-* Configure via BIOS or DHCP-assigned IP.
-* Access via web, SSH, or CLI for power cycle, remote console.
+# Export current iLO config
+hponcfg -w /tmp/ilo_config.xml
+
+in the xml get the ip, dns, gateway, subnet mask
+# Modify iLO password in XML and apply
+hponcfg -f /tmp/ilo_config.xml
 
 ---
 
@@ -73,7 +75,7 @@ iLO (Integrated Lights-Out, HP) = Remote management interface.
 
 ### 8. How do you boot into single-user mode?
 
-* GRUB menu → edit kernel line → add `single` or `systemd.unit=rescue.target`.
+* GRUB menu → edit kernel line → add `single` or `systectl isolate rescue.target`.
 * Used for password reset, recovery, fixing broken config.
 
 ---
@@ -272,20 +274,29 @@ uptime
 
 **Q19. What is DNS cache/accelerator?**
 
-* Local caching (dnsmasq, bind) → reduces external queries.
+* Local caching (dnsmasq, bind) → reduces external queries. 
+yum install dnsmasq
+/etc/dnsmasq 
+cache-size=1000
+server=8.8.8.8 -> google dns primary if not found locally, route
+server=8.8.4.4 -> secndary
+
 
 **Q20. dig, nslookup?**
 
 ```bash
 dig google.com
 nslookup google.com
+Both are DNS client troubleshooting tools. They help system/network admins check how names (like google.com) resolve to IP addresses (like 142.250.193.14).
 ```
 
 **Q21. telnet/nc for port check?**
-
+Telnet = limited, only TCP, mainly to check if a port is open.
+Netcat (nc) = versatile, supports TCP/UDP, can scan, transfer files, and act as server/client.
 ```bash
 telnet host 22
 nc -zv host 80
+nc -zvu for udpR
 ```
 
 **Q22. Important OSI layers?**
