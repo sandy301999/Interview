@@ -1,0 +1,36 @@
+1. Extract only usernames from /etc/passwd
+  cut -d: -f1 /etc/passwd 
+  cut -c 1-2 /etc/passwd 
+
+2. Print 2nd and 4th columns from CSV
+  cat s.csv | awk -F, '{print $2,$4}'
+
+3. Replace all foo with bar in a file
+   sed -i '/s/foo/bar/g' s.sh
+
+4. Print lines 10 to 20 from a file
+  sed -n '10,20p' file.txt
+
+5. Print only even lines
+  awk 'NR%2==0' file.txt
+
+6. Infinite loop (while)
+  while true; do echo "Running"; sleep 1; done
+
+7. Opposite of while → until loop
+i=1; until [ $i -gt 5 ]; do echo $i; ((i++)); done
+
+8. For loop (single line)
+for i in {1..5}; do echo $i; done
+
+9. Check if file exists
+if [ -f myfile.txt ]; then echo "Exists"; else echo "Not found"; fi
+
+10. Case statement (menu-driven)
+read -p "Enter choice: " c; case $c in start) echo "Starting";; stop) echo "Stopping";; *) echo "Invalid";; esac
+
+11. Print top 5 memory-consuming processes
+ps -eo pid,comm,%mem --sort=-%mem | head -n 6
+
+12. Extract IP addresses from a log
+grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" access.log | sort -u
