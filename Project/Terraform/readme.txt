@@ -1,4 +1,22 @@
-# Terraform AWS Infrastructure Setup - Stepwise Guide
+Terraform
+==================================================
+Remote state file management with DynamoDB locking
+Handling secrets securely
+Testing changes before applying
+Drift detection
+Managing previous state files
+Separating modules with a main configuration
+Using count and for_each
+Provider aliasing
+Avoiding downtime with lifecycle rules
+Adding existing resources to Terraform
+Managing multiple environments
+Upgrading Terraform resources
+Using workspaces
+Configuring CloudWatch alarms with Terraform
+Automating infrastructure with Jenkins
+Implementing tagging standards
+
 
 ## 1. Bootstrap Remote State
 - Create S3 bucket for state + enable versioning:
