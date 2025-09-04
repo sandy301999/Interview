@@ -14,12 +14,18 @@
 ## 2. Repo Layout
 infra/
 ├─ modules/
-│  ├─ vpc/
-│  └─ ec2/
+│ ├─ vpc/
+│ │ ├─ main.tf
+│ │ ├─ variables.tf
+│ │ └─ outputs.tf
+│ └─ ec2/
 ├─ envs/
-│  ├─ prod/
-│  └─ dev/
-└─ globals/
+│ ├─ prod/
+│ │ ├─ backend.tf
+│ │ ├─ main.tf
+│ │ └─ prod.tfvars
+│ └─ dev/
+└─ globals/ # bootstrap resources (optional)
 
 ## 3. Backend Configuration
 - Each env has `backend.tf`:
